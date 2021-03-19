@@ -1,0 +1,6 @@
+[
+    { "id": 1, "name": "Behind CLosed Doors", "author": "Rise Against", "genre": "Punk Rock", "length": "2:35"},
+    { "id": 2, "name": "Rap God", "author": "Eminem", "genre": "Rap", "length": "4:50"},
+    { "id": 3, "name": "Torero", "author": "Chayanne", "genre": "Pop", "length": "3:25"},
+    { "id": 4, "name": "Hazy Skyscraper", "author": "Demondice", "genre": "J-Rap", "length": "4:58"}
+]
