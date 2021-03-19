@@ -16,26 +16,30 @@ fs.readFile('/home/david/Proyects/ProyectoPrograWeb/prograweb-backend/prograweb-
   //console.log(listado);
 })
 
-/* GET list of songs */
-router.get('/', function(req, res, next) {
-    var string = '';
-        for (var [clave, valor] of listado) {
-            string += JSON.stringify(listado.get(clave));
-        }
-        //console.log(string)
-        res.status(200).json({songs: string});
-});
-
 /* GET specific song */
 router.get('/:id', function(req, res, next) {
-    var songid = req.params.id;
+    var songid = parseInt(req.params.id);
+    console.log(listado);
     if (listado.has(songid)){
-        res.status(200).json({ song: JSON.stringify(listado.get(songid))})
+        res.status(200).json(listado.get(songid)).send();
     }else{
-        res.status(404)
+        res.status(404).send();
     }
-    
 });
+
+/* GET list of songs */
+router.get('/', function(req, res, next) {
+    var string = [];
+        for (var [clave, valor] of listado) {
+            string.push(listado.get(clave));
+        }
+        //console.log(string)
+        res.status(200).json(string).send();
+});
+
+router.get('/test/:id', function(req, res, next) {
+    res.end(req.params.id).send();
+})
 
 router.post('/', function(req, res, next) {
     var response = {
@@ -47,23 +51,23 @@ router.post('/', function(req, res, next) {
     }
     var song = req.body;
     listado.set(req.body.id, response);
-    res.status(201);
+    res.status(201).send();
 });
   
 router.put('/:id', function(req, res, next) {
-    if(listado.has(req.params.id)){
-        listado.set(req.params.id, req.body);
-        res.status(204)
+    if(listado.has(parseInt(req.params.id))){
+        listado.set(parseInt(req.params.id), req.body);
+        res.status(204).send();
     }else{
-        res.status(404)
+        res.status(404).send();
     }
 });
   
 router.delete('/:id', function(req, res, next) {
-    if(listado.delete(req.params.id)){
-        res.status(204)
+    if(listado.delete(parseInt(req.params.id))){
+        res.status(204).send();
     }else{
-        res.status(404)
+        res.status(404).send();
     }
 });
   
