@@ -38,17 +38,33 @@ router.get('/:id', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
+    var response = {
+            "id": req.body.id,
+            "name": req.body.name,
+            "author": req.body.author,
+            "genre": req.body.genre,
+            "length": req.body.length
+    }
     var song = req.body;
-    listado.set(req.body.id, req.body);
+    listado.set(req.body.id, response);
     res.status(201);
 });
   
-router.put('/', function(req, res, next) {
-  
+router.put('/:id', function(req, res, next) {
+    if(listado.has(req.params.id)){
+        listado.set(req.params.id, req.body);
+        res.status(204)
+    }else{
+        res.status(404)
+    }
 });
   
-router.delete('/', function(req, res, next) {
-  
+router.delete('/:id', function(req, res, next) {
+    if(listado.delete(req.params.id)){
+        res.status(204)
+    }else{
+        res.status(404)
+    }
 });
   
 module.exports = router;
