@@ -1,73 +1,127 @@
 var express = require('express');
 var router = express.Router({mergeParams: true});
+const assert = require('assert');
 fs = require('fs');
-let listado = new Map();
-fs.readFile('/home/david/Proyects/ProyectoPrograWeb/prograweb-backend/prograweb-backend/routes/listado.json'
-    , 'utf8', function (err, data) {
-        //console.log(data)
-  if (err) {
-    return console.log(err);
-  }
-  var list = JSON.parse(data);
-  //console.log(list[0]);
-  for (i=0; i<list.length; i++){
-      listado.set(list[i].id, list[i]);
-  }
-  //console.log(listado);
-})
+const MongoClient = require('mongodb').MongoClient;
+const url = process.env.DBSTRING;
+const ObjectID = require('mongodb').ObjectID;
 
 /* GET specific song */
-router.get('/:id', function(req, res, next) {
-    var songid = parseInt(req.params.id);
-    console.log(listado);
-    if (listado.has(songid)){
-        res.status(200).json(listado.get(songid)).send();
-    }else{
-        res.status(404).send();
+router.get('/:id', async function(req, res, next) {
+
+    const client = new MongoClient(url);
+    var songid = req.params.id;
+
+    try {
+        await client.connect();
+
+        const result = await client.db("PrograWeb").collection("Music").find({"_id" : ObjectID(songid)}).toArray();
+        if (result.length > 0){
+            res.status(201).json({result}).send();
+        } else {
+            res.status(404).json({message: "No se encontro la cancion"}).send();
+        }
+    } catch (e) {
+        res.status(500).json({Error: "Valio madres todo", Message: e.message}).send();
+    } finally {
+        await client.close();
     }
 });
 
 /* GET list of songs */
-router.get('/', function(req, res, next) {
-    var string = [];
-        for (var [clave, valor] of listado) {
-            string.push(listado.get(clave));
+router.get('/', async function(req, res, next) {
+    const client = new MongoClient(url);
+
+    try {
+        await client.connect();
+
+        const result = await client.db("PrograWeb").collection("Music").find().toArray();
+        console.log(result);
+        result.shift();
+        if (result.length > 0){
+            res.status(201).json({data : result}).send();
+        } else {
+            res.status(404).json({message: "No se encontro la cancion"}).send();
         }
-        //console.log(string)
-        res.status(200).json(string).send();
+    } catch (e) {
+        res.status(500).json({Error: "Valio madres todo", Message: e.message}).send();
+    } finally {
+        await client.close();
+    }
 });
 
 router.get('/test/:id', function(req, res, next) {
     res.end(req.params.id).send();
 })
 
-router.post('/', function(req, res, next) {
-    var response = {
-            "id": req.body.id,
-            "name": req.body.name,
-            "author": req.body.author,
-            "genre": req.body.genre,
-            "length": req.body.length
+router.post('/', async function(req, res, next) {
+
+    const client = new MongoClient(url);
+    var song = {
+        "name": req.body.name,
+        "author": req.body.author,
+        "genre": req.body.genre,
+        "length": req.body.length
     }
-    var song = req.body;
-    listado.set(req.body.id, response);
-    res.status(201).send();
+    try {
+        await client.connect();
+
+        const result = await client.db("PrograWeb").collection("Music").insertOne(song);
+        console.log(result);
+        res.status(201).send();
+    } catch (e) {
+        res.status(500).json({Error: "Valio madres todo", Message: e.message}).send();
+    } finally {
+        await client.close();
+    }
 });
   
-router.put('/:id', function(req, res, next) {
-    if(listado.has(parseInt(req.params.id))){
-        listado.set(parseInt(req.params.id), req.body);
-        res.status(204).send();
-    }else{
-        res.status(404).send();
+router.put('/:id', async function(req, res, next) {
+    const client = new MongoClient(url);
+
+    var songid = req.params.id;
+    var song = {
+        "name": req.body.name,
+        "author": req.body.author,
+        "genre": req.body.genre,
+        "length": req.body.length
+    }
+
+    try {
+        await client.connect();
+
+        const result = await client.db("PrograWeb").collection("Music").replaceOne({"_id" : ObjectID(songid)},song);
+
+        if (result.matchedCount !== 0){
+            res.status(202).json({Message : "La cancion se actualizo con exito"}).send();
+        } else {
+            res.status(404).json({Message : "No se encontro la cancion"}).send();
+        }
+    } catch (e) {
+        res.status(500).json({Error: "Valio madres todo", Message: e.message}).send();
+    } finally {
+        await client.close();
     }
 });
   
-router.delete('/:id', function(req, res, next) {
-    if(listado.delete(parseInt(req.params.id))){
-        res.status(204).send();
-    }else{
-        res.status(404).send();
+router.delete('/:id', async function(req, res, next) {
+
+    const client = new MongoClient(url);
+    var songid = req.params.id;
+
+    try {
+        await client.connect();
+
+        const result = await client.db("PrograWeb").collection("Music").deleteOne({"_id" : ObjectID(songid)});
+        if (result.deletedCount !== 0){
+            res.status(202).json({Message : "La cancion se borro con exito"}).send();
+        } else {
+            res.status(404).json({Message : "No se encontro la cancion"}).send();
+        }
+    } catch (e) {
+        res.status(500).json({Error: "Valio madres todo", Message: e.message}).send();
+    } finally {
+        await client.close();
     }
 });
   
