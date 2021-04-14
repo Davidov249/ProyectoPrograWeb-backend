@@ -54,6 +54,7 @@ router.get('/test/:id', function(req, res, next) {
     res.end(req.params.id).send();
 })
 
+/* POST song */
 router.post('/', async function(req, res, next) {
 
     const client = new MongoClient(url);
@@ -75,7 +76,8 @@ router.post('/', async function(req, res, next) {
         await client.close();
     }
 });
-  
+
+/* PUT(update) specific song */
 router.put('/:id', async function(req, res, next) {
     const client = new MongoClient(url);
 
@@ -103,7 +105,8 @@ router.put('/:id', async function(req, res, next) {
         await client.close();
     }
 });
-  
+
+/* DELETE specific song */
 router.delete('/:id', async function(req, res, next) {
 
     const client = new MongoClient(url);
