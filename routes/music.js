@@ -9,7 +9,7 @@ const ObjectID = require('mongodb').ObjectID;
 /* GET specific song */
 router.get('/:id', async function(req, res, next) {
 
-    const client = new MongoClient(url);
+    const client = new MongoClient(url, { useUnifiedTopology: true, useNewUrlParser: true });
     var songid = req.params.id;
 
     try {
@@ -17,7 +17,7 @@ router.get('/:id', async function(req, res, next) {
 
         const result = await client.db("PrograWeb").collection("Music").find({"_id" : ObjectID(songid)}).toArray();
         if (result.length > 0){
-            res.status(201).json({result}).send();
+            res.status(200).json({result}).send();
         } else {
             res.status(404).json({message: "No se encontro la cancion"}).send();
         }
@@ -39,7 +39,7 @@ router.get('/', async function(req, res, next) {
         console.log(result);
         result.shift();
         if (result.length > 0){
-            res.status(201).json({data : result}).send();
+            res.status(200).json(result).send();
         } else {
             res.status(404).json({message: "No se encontro la cancion"}).send();
         }
