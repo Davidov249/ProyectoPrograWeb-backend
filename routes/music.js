@@ -30,13 +30,12 @@ router.get('/:id', async function(req, res, next) {
 
 /* GET list of songs */
 router.get('/', async function(req, res, next) {
-    const client = new MongoClient(url);
+    const client = new MongoClient(url, { useUnifiedTopology: true, useNewUrlParser: true });
 
     try {
         await client.connect();
 
         const result = await client.db("PrograWeb").collection("Music").find().toArray();
-        console.log(result);
         result.shift();
         if (result.length > 0){
             res.status(200).json(result).send();
@@ -57,7 +56,7 @@ router.get('/test/:id', function(req, res, next) {
 /* POST song */
 router.post('/', async function(req, res, next) {
 
-    const client = new MongoClient(url);
+    const client = new MongoClient(url, { useUnifiedTopology: true, useNewUrlParser: true });
     var song = {
         "name": req.body.name,
         "author": req.body.author,
@@ -68,7 +67,6 @@ router.post('/', async function(req, res, next) {
         await client.connect();
 
         const result = await client.db("PrograWeb").collection("Music").insertOne(song);
-        console.log(result);
         res.status(201).send();
     } catch (e) {
         res.status(500).json({Error: "Valio madres todo", Message: e.message}).send();
@@ -79,7 +77,7 @@ router.post('/', async function(req, res, next) {
 
 /* PUT(update) specific song */
 router.put('/:id', async function(req, res, next) {
-    const client = new MongoClient(url);
+    const client = new MongoClient(url, { useUnifiedTopology: true, useNewUrlParser: true });
 
     var songid = req.params.id;
     var song = {
@@ -109,7 +107,7 @@ router.put('/:id', async function(req, res, next) {
 /* DELETE specific song */
 router.delete('/:id', async function(req, res, next) {
 
-    const client = new MongoClient(url);
+    const client = new MongoClient(url, { useUnifiedTopology: true, useNewUrlParser: true });
     var songid = req.params.id;
 
     try {
