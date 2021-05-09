@@ -1,6 +1,8 @@
 let chai = require("chai");
 let chaiHttp = require("chai-http");
 const { response } = require("../app");
+const sinon = require("sinon");
+const auth = require("../routes/auth")
 let server = require("../app");
 
 //Assertion Style
@@ -12,15 +14,14 @@ describe('Rutas Musica', () => {
     /**
      * Test de ruta GET
      */
-
-    describe("GET /api/v1/music", () => {
-        it("It should GET all the songs", (done) => {
+    sinon.stub(auth, "verifyJwt").callsFake(async (req, res, next) => next());
+    describe("GET /api/v1/music/:id", () => {
+        it("It should GET user playlist", () => {
             chai.request(server)
-                .get("/api/v1/music")
+                .get("/api/v1/music/davidov249@gmail.com")
                 .end((err, response) => {
                     response.should.have.status(200);
                     response.body.should.be.a('array');
-                done();
                 })
         })
     })
@@ -29,15 +30,14 @@ describe('Rutas Musica', () => {
      * Test de ruta GET (por id)
      */
 
-     describe("GET /api/v1/music/:param", () => {
-        it("It should GET a song by id", (done) => {
+    describe("GET /api/v1/music/one/:id", () => {
+        it("It should GET a song by id", () => {
             chai.request(server)
-                .get("/api/v1/music/60711170b7408b580ca4566c")
+                .get("/api/v1/music/one/60984206893f5b08900a0885")
                 .end((err, response) => {
                     response.should.have.status(200);
                     response.body.should.be.a('object');
-                    response.body.result[0].name.should.equal("Hand Granades")
-                done();
+                    response.body.result[0].name.should.equal("Hazy Skyscraper")
                 })
         })
     })
@@ -47,8 +47,9 @@ describe('Rutas Musica', () => {
      */
 
      describe("POST /api/v1/music/", () => {
-        it("It should POST a new song", (done) => {
+        it("It should POST a new song", () => {
             const song = {
+                userid: "UsuarioPrueba",
                 name: "Prueba",
                 author: "ChaiTest",
                 genre: "Testing",
@@ -60,7 +61,6 @@ describe('Rutas Musica', () => {
                 .end((err, response) => {
                     response.should.have.status(201);
                     response.body.should.be.a('object');
-                done();
                 })
         })
     })
@@ -70,24 +70,24 @@ describe('Rutas Musica', () => {
      */
 
      describe("PUT /api/v1/music/:id", () => {
-        it("It should PUT an update on a song", (done) => {
+        it("It should PUT an update on a song", () => {
             const song = {
-                name: "Hand Granades",
-                author: "The Offspring",
-                genre: "Punk Rock",
-                length: "1:06"
+                userid: "UsuarioPrueba",
+                name: "Prueba",
+                author: "ChaiTest",
+                genre: "Testing",
+                length: "3:21"
             }
             chai.request(server)
-                .put("/api/v1/music/60711170b7408b580ca4566c")
+                .put("/api/v1/music/60985abae9c04209ce3ddd56")
                 .send(song)
                 .end((err, response) => {
                     response.should.have.status(202);
                     response.body.should.be.a('object');
-                done();
                 })
         })
     })
-
+    auth.verifyJwt.restore();
     /**
      * Test de ruta DELETE
      */

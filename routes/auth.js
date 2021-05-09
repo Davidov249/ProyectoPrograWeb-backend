@@ -1,7 +1,7 @@
 const { createRemoteJWKSet } = require('jose/jwks/remote');
 const { jwtVerify } = require('jose/jwt/verify');
 
-const validate = async (req, res, next) => {
+const verifyJwt = async (req, res, next) => {
     const url = process.env.JwtCognitoUrl;
     const JWKS = createRemoteJWKSet(new URL(url));
     var token = req.headers.authorization;
@@ -14,7 +14,8 @@ const validate = async (req, res, next) => {
         return next()
     } catch (e) {
         console.log(e.message)
+        return res.status(403).json({ "Error" : e.message})
     }
 }
 
-module.exports = {validate};
+module.exports = {verifyJwt};

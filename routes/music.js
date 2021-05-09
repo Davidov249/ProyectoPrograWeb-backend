@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router({mergeParams: true});
+/*const redis = require('redis');
+const redisClient = redis.createClient(6379);*/
 const assert = require('assert');
 fs = require('fs');
 const MongoClient = require('mongodb').MongoClient;
@@ -7,13 +9,14 @@ const url = process.env.DBSTRING;
 const ObjectID = require('mongodb').ObjectID;
 
 /* GET specific song */
-router.get('/:id', async function(req, res, next) {
+router.get('/one/:id', async function(req, res, next) {
 
     const client = new MongoClient(url, { useUnifiedTopology: true, useNewUrlParser: true });
     var songid = req.params.id;
 
     try {
         await client.connect();
+        //redisClient.SADD
 
         const result = await client.db("PrograWeb").collection("Music").find({"_id" : ObjectID(songid)}).toArray();
         if (result.length > 0){
@@ -28,19 +31,20 @@ router.get('/:id', async function(req, res, next) {
     }
 });
 
-/* GET list of songs */
-router.get('/', async function(req, res, next) {
+/* GET user playlist */
+router.get('/:userid', async function(req, res, next) {
     const client = new MongoClient(url, { useUnifiedTopology: true, useNewUrlParser: true });
+    var userid = req.params.userid;
 
     try {
         await client.connect();
 
-        const result = await client.db("PrograWeb").collection("Music").find().toArray();
-        result.shift();
+        const result = await client.db("PrograWeb").collection("Music").find({"userid" : userid}).toArray();
+        //result.shift();
         if (result.length > 0){
             res.status(200).json(result).send();
         } else {
-            res.status(404).json({message: "No se encontro la cancion"}).send();
+            res.status(404).json({message: "No se encontro la playlist"}).send();
         }
     } catch (e) {
         res.status(500).json({Error: "Valio madres todo", Message: e.message}).send();
@@ -58,6 +62,7 @@ router.post('/', async function(req, res, next) {
 
     const client = new MongoClient(url, { useUnifiedTopology: true, useNewUrlParser: true });
     var song = {
+        "userid": req.body.userid,
         "name": req.body.name,
         "author": req.body.author,
         "genre": req.body.genre,
@@ -81,6 +86,7 @@ router.put('/:id', async function(req, res, next) {
 
     var songid = req.params.id;
     var song = {
+        "userid": req.body.userid,
         "name": req.body.name,
         "author": req.body.author,
         "genre": req.body.genre,
