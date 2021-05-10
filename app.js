@@ -51,7 +51,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/api/v1/music', /*verifyJwt,*/musicRouter);
+app.use('/api/v1/music', verifyJwt,musicRouter);
+app.get("/healthcheck", (req, res, next) => {
+  res.status(200).send();
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
