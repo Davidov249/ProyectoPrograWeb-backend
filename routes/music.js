@@ -72,6 +72,7 @@ router.post('/', async function(req, res, next) {
         await client.connect();
 
         const result = await client.db("PrograWeb").collection("Music").insertOne(song);
+        console.log("llego al post")
         res.status(201).send();
     } catch (e) {
         res.status(500).json({Error: "Valio madres todo", Message: e.message}).send();

@@ -1,9 +1,7 @@
 let chai = require("chai");
 let chaiHttp = require("chai-http");
-const { response } = require("../app");
 const sinon = require("sinon");
 const auth = require("../routes/auth")
-let server = require("../app");
 
 //Assertion Style
 chai.should();
@@ -15,10 +13,11 @@ describe('Rutas Musica', () => {
      * Test de ruta GET
      */
     sinon.stub(auth, "verifyJwt").callsFake(async (req, res, next) => next());
+    let server = require("../app");
     describe("GET /api/v1/music/:id", () => {
         it("It should GET user playlist", () => {
             chai.request(server)
-                .get("/api/v1/music/davidov249@gmail.com")
+                .get("/api/v1/music/UsuarioPrueba")
                 .end((err, response) => {
                     response.should.have.status(200);
                     response.body.should.be.a('array');
@@ -50,7 +49,7 @@ describe('Rutas Musica', () => {
         it("It should POST a new song", () => {
             const song = {
                 userid: "UsuarioPrueba",
-                name: "Prueba",
+                name: "Pruebax",
                 author: "ChaiTest",
                 genre: "Testing",
                 length: "1:23"
@@ -88,7 +87,4 @@ describe('Rutas Musica', () => {
         })
     })
     auth.verifyJwt.restore();
-    /**
-     * Test de ruta DELETE
-     */
-})
+});

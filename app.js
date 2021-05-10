@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
 const { verifyJwt } = require("./routes/auth");
+//const { redisMiddleware } = require("./routes/redis");
 require('dotenv').config();
 
 var indexRouter = require('./routes/index');
@@ -50,7 +51,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/api/v1/music'/*, verifyJwt*/ , musicRouter);
+app.use('/api/v1/music', /*verifyJwt,*/musicRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
